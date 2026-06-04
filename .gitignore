@@ -19,3 +19,9 @@ ra_gen/
 
 # Logs
 *.log
+
+# e² studio debug configs
+*.launch
+
+# J-Link debug configs
+*.jlink
