@@ -1,0 +1,21 @@
+# e² studio / Renesas build
+Debug/
+Release/
+*.o
+*.d
+*.map
+*.elf
+*.axf
+*.pdb
+
+# FSP generated files (opcional según proyecto)
+ra_cfg/
+ra_gen/
+
+# OS / IDE
+.vscode/
+.settings/
+.metadata/
+
+# Logs
+*.log
