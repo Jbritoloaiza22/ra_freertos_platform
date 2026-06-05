@@ -5,6 +5,7 @@
         <peripheral name="PORT0.CM23" group="PORT">
             <slot name="P001.CM23" secure="false"/>
             <slot name="P003.CM23" secure="false"/>
+            <slot name="P015.CM23" secure="false"/>
         </peripheral>
         <peripheral name="PORT1.CM23" group="PORT">
             <slot name="P108.CM23" secure="false"/>
@@ -30,6 +31,13 @@
         <peripheral name="PORT9.CM23" group="PORT">
             <slot name="P914.CM23" secure="false"/>
             <slot name="P915.CM23" secure="false"/>
+        </peripheral>
+        <peripheral name="SPI0.CM23" group="SPI" security=""/>
+        <peripheral name="ICU.CM23">
+            <slot name="IRQ0.CM23" secure="false"/>
+            <slot name="IRQ1.CM23" secure="false"/>
+            <slot name="IRQ2.CM23" secure="false"/>
+            <slot name="IRQ3.CM23" secure="false"/>
         </peripheral>
     </partition>
 </azone>
