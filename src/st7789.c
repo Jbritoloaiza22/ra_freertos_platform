@@ -3,6 +3,8 @@
 #include "bsp_api.h"
 #include "r_ioport.h"
 #include "r_spi.h"
+#include "FreeRTOS.h"
+#include "task.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -12,6 +14,7 @@
 #define LCD_H_RES 240
 #define LCD_V_RES 320
 
+#define LCD_BUF_LINES 10
 /* =========================
  * FSP HANDLES
  * ========================= */
@@ -23,16 +26,40 @@ extern ioport_instance_ctrl_t g_ioport_ctrl;
 /* =========================
  * PINS
  * ========================= */
-#define PIN_DC   BSP_IO_PORT_01_PIN_03
-#define PIN_RST  BSP_IO_PORT_01_PIN_04
+#define PIN_DC   BSP_IO_PORT_01_PIN_07
+#define PIN_RST  BSP_IO_PORT_01_PIN_15
 #define PIN_BL   BSP_IO_PORT_01_PIN_05
+#define PIN_CS   BSP_IO_PORT_01_PIN_12
 
 /* =========================
  * LVGL
  * ========================= */
 static lv_display_t *disp;
-static lv_color_t *buf1;
-static lv_color_t *buf2;
+static uint16_t draw_buf[LCD_H_RES * LCD_BUF_LINES];
+
+/* SPI sync (binary semaphore signaled from spi_callback)*/
+
+static TaskHandle_t spi_owner_task;
+
+void spi_callback(spi_callback_args_t *p_args)
+{
+    if(NULL == p_args)
+    {
+        return;
+    }
+
+    if(SPI_EVENT_TRANSFER_COMPLETE == p_args->event)
+    {
+        BaseType_t hp_woken = pdFALSE;
+        if(NULL != spi_owner_task)
+        {
+            BaseType_t hp_woken = pdFALSE;
+            vTaskNotifyGiveFromISR(spi_owner_task, &hp_woken);
+            portYIELD_FROM_ISR(hp_woken);
+        }
+    }
+}
+
 
 /* =========================
  * GPIO helper
@@ -49,24 +76,26 @@ static inline void pin_write(bsp_io_port_pin_t pin, bool level)
  * ========================= */
 static void st7789_write(const uint8_t *data, uint32_t len)
 {
-    fsp_err_t err;
+    spi_owner_task = xTaskGetCurrentTaskHandle();
 
-    err = R_SPI_Write(&g_spi0_ctrl,
+    if(0 ==len)
+    {
+        return;
+    }
+    (void)ulTaskNotifyTake(pdTRUE,0);
+    pin_write(PIN_CS, false);
+    fsp_err_t err = R_SPI_Write(&g_spi0_ctrl,
                       data,
                       len,
                       SPI_BIT_WIDTH_8_BITS);
-
     if (FSP_SUCCESS != err)
     {
         /* aquí podrías loggear error */
+        pin_write(PIN_CS, true);
         return;
     }
-
-    /* IMPORTANTE: esperar que termine transferencia */
-    while (g_spi0_ctrl.open == false)
-    {
-        /* safe wait */
-    }
+    (void)ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+    pin_write(PIN_CS, true);
 }
 
 /* =========================
@@ -89,6 +118,12 @@ static void st7789_data(const uint8_t *data, uint32_t len)
  * ========================= */
 static void st7789_hw_init(void)
 {
+    (void) R_IOPORT_PinCfg(&g_ioport_ctrl, PIN_CS, IOPORT_CFG_PORT_DIRECTION_OUTPUT | IOPORT_CFG_PORT_OUTPUT_HIGH);
+    (void) R_IOPORT_PinCfg(&g_ioport_ctrl, PIN_DC, IOPORT_CFG_PORT_DIRECTION_OUTPUT );
+    (void) R_IOPORT_PinCfg(&g_ioport_ctrl, PIN_RST, IOPORT_CFG_PORT_DIRECTION_OUTPUT );
+    (void) R_IOPORT_PinCfg(&g_ioport_ctrl, PIN_BL, IOPORT_CFG_PORT_DIRECTION_OUTPUT );
+    pin_write(PIN_CS, true);
+    (void) R_SPI_Open(&g_spi0_ctrl, &g_spi0_cfg);
     pin_write(PIN_BL, true);
 
     pin_write(PIN_RST, false);
@@ -102,6 +137,12 @@ static void st7789_hw_init(void)
     uint8_t colmod = 0x55; // RGB565
     st7789_cmd(0x3A);
     st7789_data(&colmod, 1);
+
+    uint8_t madcl = 0x00;
+    st7789_cmd(0x36);
+    st7789_data(&madcl, 1);
+
+    st7789_cmd(0x21); // inversion on
 
     st7789_cmd(0x29); // display on
 }
@@ -146,7 +187,7 @@ static void lvgl_flush_cb(lv_display_t *d,
     pin_write(PIN_DC, true);
 
     /* enviar buffer completo */
-    st7789_write(px_map, w * h * sizeof(lv_color_t));
+    st7789_write(px_map, w * h * 2);
 
     lv_display_flush_ready(d);
 }
@@ -162,22 +203,16 @@ void st7789_init(void)
     /* LVGL display create */
     disp = lv_display_create(LCD_H_RES, LCD_V_RES);
 
-    if (!disp)
+    if(NULL == disp)
+    {
+        /* aquí podrías loggear error */
         return;
-
-    /* buffers (IMPORTANTE: 16-bit alignment ayuda mucho) */
-    size_t buf_size = LCD_H_RES * 40 * sizeof(lv_color_t);
-
-    buf1 = malloc(buf_size);
-    buf2 = malloc(buf_size);
-
-    if (!buf1 || !buf2)
-        return;
+    }
 
     lv_display_set_buffers(disp,
-                          buf1,
-                          buf2,
-                          buf_size,
+                          draw_buf,
+                          NULL,
+                          sizeof(draw_buf),
                           LV_DISPLAY_RENDER_MODE_PARTIAL);
 
     lv_display_set_flush_cb(disp, lvgl_flush_cb);
