@@ -399,3 +399,12 @@ FSP Configuration
         Number of Transfer Descriptors: 1
         Activation Source: SPI0 RXI (Receive buffer full)
         
+  Thread "RTC_interface"
+    Symbol: RTC
+    Name: RTC_interface
+    Stack size (bytes): 1024
+    Priority: 1
+    Thread Context: NULL
+    Memory Allocation: Static
+    Allocate Secure Context: Enable
+    
