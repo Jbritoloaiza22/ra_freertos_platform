@@ -3,6 +3,12 @@
 #include "task.h"
 #include "lvgl.h"
 #include "st7789.h"
+#include "RTC.h"
+#include <stdio.h>
+
+#define GUI_TICK_MS (5U)
+#define TIME_REFRESH_MS (1000U)
+
 static uint32_t lv_tick_get_ms(void)
 {
     return (uint32_t)(xTaskGetTickCount() * portTICK_PERIOD_MS);
@@ -48,18 +54,35 @@ void GUI_entry(void *pvParameters)
     lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), LV_PART_MAIN);
     lv_obj_align(label, LV_ALIGN_TOP_LEFT, 0, 75);
 
-    label = lv_label_create(scr);
-    lv_label_set_text(label, "TIME: 00:00:00");
-    lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), LV_PART_MAIN);
-    lv_obj_align(label, LV_ALIGN_TOP_LEFT, 0, 100);
+    lv_obj_t *time_label = lv_label_create(scr);
+    lv_label_set_text(time_label, "TIME: --:--:--");
+    lv_obj_set_style_text_color(time_label, lv_color_hex(0xffffff), LV_PART_MAIN);
+    lv_obj_align(time_label, LV_ALIGN_TOP_LEFT, 0, 100);
 
 
     /* -------------------------
      * Main LVGL loop
      * ------------------------- */
+    uint32_t time_acc_ms = 0;
+    rtc_time_t rtc_now;
+    char time_buf[32];
+
     while (1)
     {
         lv_timer_handler();
-        vTaskDelay(pdMS_TO_TICKS(5));
+
+        time_acc_ms += GUI_TICK_MS;
+        if (time_acc_ms >= TIME_REFRESH_MS)
+        {
+            time_acc_ms = 0;
+
+                if (RTC_GetTime(&rtc_now))
+                {
+                    snprintf(time_buf, sizeof(time_buf), "TIME: %02d:%02d:%02d",
+                             rtc_now.tm_hour, rtc_now.tm_min, rtc_now.tm_sec);
+                    lv_label_set_text(time_label, time_buf);
+                }
+        }
+        vTaskDelay(pdMS_TO_TICKS(GUI_TICK_MS));
     }
 }

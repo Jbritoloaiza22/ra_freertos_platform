@@ -251,6 +251,10 @@ FSP Configuration
     Parameter Checking: Default (BSP)
     Linker section to keep DTC vector table: .fsp_dtc_vector_table
     
+  Module "Realtime Clock (r_rtc)"
+    Parameter Checking: Default (BSP)
+    Set Source Clock in Open: Enabled
+    
   FreeRTOS
     General: Custom FreeRTOSConfig.h: 
     General: Use Preemption: Enabled
@@ -399,3 +403,25 @@ FSP Configuration
         Number of Transfer Descriptors: 1
         Activation Source: SPI0 RXI (Receive buffer full)
         
+  Thread "RTC_interface"
+    Symbol: RTC
+    Name: RTC_interface
+    Stack size (bytes): 1024
+    Priority: 1
+    Thread Context: NULL
+    Memory Allocation: Static
+    Allocate Secure Context: Enable
+    
+    Instance "g_rtc0 Realtime Clock (r_rtc)"
+      Name: g_rtc0
+      Clock Source: LOCO
+      Frequency Comparison Value (LOCO): 255
+      Automatic Adjustment Mode: Enabled
+      Automatic Adjustment Period: 10 Seconds
+      Adjustment Type (Plus-Minus): NONE
+      Error Adjustment Value: 0
+      Callback: NULL
+      Alarm Interrupt Priority: Disabled
+      Period Interrupt Priority: Disabled
+      Carry Interrupt Priority: Priority 2
+      
