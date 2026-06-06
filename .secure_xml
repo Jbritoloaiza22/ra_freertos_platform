@@ -68,8 +68,8 @@
       <configSetting altId="p411.gpio_mode.gpio_mode_peripheral" configurationId="p411.gpio_mode"/>
       <configSetting altId="p914.gpio_mode.gpio_mode_peripheral" configurationId="p914.gpio_mode"/>
       <configSetting altId="p915.gpio_mode.gpio_mode_peripheral" configurationId="p915.gpio_mode"/>
-      <configSetting altId="sci0.rxd.p204" configurationId="sci0.rxd" isUsedByDriver="true" peripheral="SCI0"/>
-      <configSetting altId="sci0.txd.p411" configurationId="sci0.txd" isUsedByDriver="true" peripheral="SCI0"/>
+      <configSetting altId="sci0.rxd.p204" configurationId="sci0.rxd" peripheral="SCI0"/>
+      <configSetting altId="sci0.txd.p411" configurationId="sci0.txd" peripheral="SCI0"/>
       <configSetting altId="spi0.miso.p304" configurationId="spi0.miso" isUsedByDriver="true" peripheral="SPI0"/>
       <configSetting altId="spi0.mosi.p303" configurationId="spi0.mosi" isUsedByDriver="true" peripheral="SPI0"/>
       <configSetting altId="spi0.rspck.p111" configurationId="spi0.rspck" isUsedByDriver="true" peripheral="SPI0"/>
