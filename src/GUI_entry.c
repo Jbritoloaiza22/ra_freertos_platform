@@ -5,11 +5,15 @@
 #include "st7789.h"
 #include "RTC.h"
 #include "TEMP.h"
+#include "RELAY.h"
 #include <stdio.h>
+#include <stdbool.h>
 
 #define GUI_TICK_MS (5U)
 #define TIME_REFRESH_MS (1000U)
 #define TEMP_REFRESH_MS (1000U)
+#define RELAY_REFRESH_MS (200U)
+
 void TEMP_QueueInit(void);
 bool TEMP_GetCelsius(float *out_c);
 void TEMP_entry(void *pvParameters);
@@ -63,14 +67,21 @@ void GUI_entry(void *pvParameters)
     lv_obj_set_style_text_color(time_label, lv_color_hex(0xffffff), LV_PART_MAIN);
     lv_obj_align(time_label, LV_ALIGN_TOP_LEFT, 0, 100);
 
+    lv_obj_t *relay_label = lv_label_create(scr);
+    lv_label_set_text(relay_label, "RELAY: OFF");
+    lv_obj_set_style_text_color(relay_label, lv_color_hex(0xffffff), LV_PART_MAIN);
+    lv_obj_align(relay_label, LV_ALIGN_TOP_LEFT, 0, 125);
 
     /* -------------------------
      * Main LVGL loop
      * ------------------------- */
     uint32_t time_acc_ms = 0;
     uint32_t temp_acc_ms = 0;
+    uint32_t relay_acc_ms = 0;
     rtc_time_t rtc_now;
     float temp_c = 0.0f;
+    bool relay_on = false;
+    bool relay_shown = false;
     char time_buf[32];
     char temp_buf[32];
 
@@ -100,6 +111,19 @@ void GUI_entry(void *pvParameters)
             {
                 snprintf(temp_buf, sizeof(temp_buf), "TEMP: %5.1f C", (double)temp_c);
                 lv_label_set_text(temp_label, temp_buf);
+            }
+        }
+
+        relay_acc_ms += GUI_TICK_MS;
+        if (relay_acc_ms >= RELAY_REFRESH_MS)
+        {
+            relay_acc_ms = 0;
+
+            if(RELAY_GetState(&relay_on) && (relay_on != relay_shown))
+            {
+                relay_shown = relay_on;
+                lv_label_set_text(relay_label, relay_on ? "RELAY: ON" : "RELAY: OFF");
+                relay_shown = relay_on;
             }
         }
         vTaskDelay(pdMS_TO_TICKS(GUI_TICK_MS));

@@ -26,6 +26,7 @@
         <peripheral name="PORT4.CM23" group="PORT">
             <slot name="P407.CM23" secure="false"/>
             <slot name="P409.CM23" secure="false"/>
+            <slot name="P410.CM23" secure="false"/>
             <slot name="P411.CM23" secure="false"/>
         </peripheral>
         <peripheral name="PORT9.CM23" group="PORT">
