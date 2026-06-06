@@ -9,7 +9,13 @@
 #include <string.h>
 
  
-
+#define RTC_INIT_YEAR (126)
+#define RTC_INIT_MONTH (6)
+#define RTC_INIT_DAY (5)
+#define RTC_INIT_HOUR (18)
+#define RTC_INIT_MIN (38)
+#define RTC_INIT_SEC (0)
+#define RTC_INIT_WDAY (5) /* Friday */
 /* =========================
 
  * FSP HANDLES
@@ -72,21 +78,20 @@ void RTC_init(void)
 
     memset(&t, 0, sizeof(t));
 
-    t.tm_year = 126;   /* years since 1900 -> 2026 */
+    t.tm_year = RTC_INIT_YEAR;   /* years since 1900 -> 2026 */
 
-    t.tm_mon  = 5;     /* 0..11 -> June           */
+    t.tm_mon  = RTC_INIT_MONTH;     /* 0..11 -> June           */
 
-    t.tm_mday = 5;
+    t.tm_mday = RTC_INIT_DAY;
 
-    t.tm_hour = 12;
+    t.tm_hour = RTC_INIT_HOUR;
 
-    t.tm_min  = 0;
+    t.tm_min  = RTC_INIT_MIN;
 
-    t.tm_sec  = 0;
+    t.tm_sec  = RTC_INIT_SEC;
 
-    t.tm_wday = 5;     /* Friday */
+    t.tm_wday = RTC_INIT_WDAY;     /* Friday */
 
- 
 
     (void) R_RTC_CalendarTimeSet(&g_rtc0_ctrl, &t);
 
