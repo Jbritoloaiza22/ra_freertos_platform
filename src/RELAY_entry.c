@@ -5,7 +5,7 @@
 #include "FreeRTOS.h"
 
 #include "task.h"
-
+#include "queue.h"
  
 
 /* Poll period and simple debounce window (in ticks). */
@@ -14,7 +14,36 @@
 
 #define RELAY_DEBOUNCE_SAMPLES  (3U)
 
- 
+static QueueHandle_t g_relay_queue = NULL;
+static StaticQueue_t g_relay_queue_buf;
+static uint8_t g_relay_queue_storage[sizeof(bool)];
+
+void RELAY_QueueInit(void)
+{
+    if(NULL == g_relay_queue)
+    {
+        g_relay_queue = xQueueCreateStatic(1, sizeof(bool), g_relay_queue_storage, &g_relay_queue_buf);
+    }
+}
+
+bool RELAY_GetState(bool *out_on)
+{
+    if (NULL == g_relay_queue || NULL == out_on)
+    {
+        return false;
+    }
+
+    return pdTRUE == xQueueReceive(g_relay_queue, out_on, 0U);
+}
+
+static void relay_publish(bool on)
+{
+    if(NULL != g_relay_queue)
+    {
+        /* Ignore failure, which only occurs if the queue is full. */
+        (void) xQueueOverwrite(g_relay_queue, &on);
+    }
+}
 
 /* RELAY_interface entry function */
 
@@ -26,7 +55,7 @@ void RELAY_entry(void *pvParameters)
 
     FSP_PARAMETER_NOT_USED (pvParameters);
 
- 
+    RELAY_QueueInit();
 
     /* Button is active LOW. Start assuming released (HIGH). */
 
@@ -51,7 +80,7 @@ void RELAY_entry(void *pvParameters)
     R_BSP_PinWrite(RELAY_OUT_PIN, out_state);
 
     R_BSP_PinAccessDisable();
-
+    relay_publish(false);
  
 
     while (1)
@@ -123,6 +152,7 @@ void RELAY_entry(void *pvParameters)
                 R_BSP_PinWrite(RELAY_OUT_PIN, out_state);
 
                 R_BSP_PinAccessDisable();
+                relay_publish(BSP_IO_LEVEL_HIGH == out_state);
 
             }
 

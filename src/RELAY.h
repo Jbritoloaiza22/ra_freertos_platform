@@ -9,3 +9,6 @@
 #define RELAY_OUT_PIN (BSP_IO_PORT_04_PIN_10)
 
 void RELAY_entry(void * pvParameters);
+
+void RELAY_QueueInit(void);
+bool RELAY_GetState(bool *out_on);
