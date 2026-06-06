@@ -520,3 +520,12 @@ FSP Configuration
       Interrupts: Transmit End Interrupt Priority: Priority 2
       Interrupts: Error Interrupt Priority: Priority 2
       
+  Thread "RELAY_interface"
+    Symbol: RELAY
+    Name: RELAY_interface
+    Stack size (bytes): 1024
+    Priority: 1
+    Thread Context: NULL
+    Memory Allocation: Static
+    Allocate Secure Context: Enable
+    
