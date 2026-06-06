@@ -4,11 +4,15 @@
 #include "lvgl.h"
 #include "st7789.h"
 #include "RTC.h"
+#include "TEMP.h"
 #include <stdio.h>
 
 #define GUI_TICK_MS (5U)
 #define TIME_REFRESH_MS (1000U)
-
+#define TEMP_REFRESH_MS (1000U)
+void TEMP_QueueInit(void);
+bool TEMP_GetCelsius(float *out_c);
+void TEMP_entry(void *pvParameters);
 static uint32_t lv_tick_get_ms(void)
 {
     return (uint32_t)(xTaskGetTickCount() * portTICK_PERIOD_MS);
@@ -49,10 +53,10 @@ void GUI_entry(void *pvParameters)
     lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), LV_PART_MAIN);
     lv_obj_align(label, LV_ALIGN_TOP_LEFT, 0, 50);
 
-    label = lv_label_create(scr);
-    lv_label_set_text(label, "TEMP:     0.0 C");
-    lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), LV_PART_MAIN);
-    lv_obj_align(label, LV_ALIGN_TOP_LEFT, 0, 75);
+    lv_obj_t *temp_label = lv_label_create(scr);
+    lv_label_set_text(temp_label, "TEMP:     --.- C");
+    lv_obj_set_style_text_color(temp_label, lv_color_hex(0xffffff), LV_PART_MAIN);
+    lv_obj_align(temp_label, LV_ALIGN_TOP_LEFT, 0, 75);
 
     lv_obj_t *time_label = lv_label_create(scr);
     lv_label_set_text(time_label, "TIME: --:--:--");
@@ -64,8 +68,11 @@ void GUI_entry(void *pvParameters)
      * Main LVGL loop
      * ------------------------- */
     uint32_t time_acc_ms = 0;
+    uint32_t temp_acc_ms = 0;
     rtc_time_t rtc_now;
+    float temp_c = 0.0f;
     char time_buf[32];
+    char temp_buf[32];
 
     while (1)
     {
@@ -82,6 +89,18 @@ void GUI_entry(void *pvParameters)
                              rtc_now.tm_hour, rtc_now.tm_min, rtc_now.tm_sec);
                     lv_label_set_text(time_label, time_buf);
                 }
+        }
+
+        temp_acc_ms += GUI_TICK_MS;
+        if (temp_acc_ms >= TEMP_REFRESH_MS)
+        {
+            temp_acc_ms = 0;
+
+            if (TEMP_GetCelsius(&temp_c))
+            {
+                snprintf(temp_buf, sizeof(temp_buf), "TEMP: %5.1f C", (double)temp_c);
+                lv_label_set_text(temp_label, temp_buf);
+            }
         }
         vTaskDelay(pdMS_TO_TICKS(GUI_TICK_MS));
     }

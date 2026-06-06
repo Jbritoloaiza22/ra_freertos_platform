@@ -26,12 +26,12 @@
     <node id="board.clock.iclk.display" option="board.clock.iclk.display.value"/>
     <node id="board.clock.pclkb.div" option="board.clock.pclkb.div.2"/>
     <node id="board.clock.pclkb.display" option="board.clock.pclkb.display.value"/>
-    <node id="board.clock.pclkd.div" option="board.clock.pclkd.div.1"/>
+    <node id="board.clock.pclkd.div" option="board.clock.pclkd.div.2"/>
     <node id="board.clock.pclkd.display" option="board.clock.pclkd.display.value"/>
     <node id="board.clock.fclk.div" option="board.clock.fclk.div.2"/>
     <node id="board.clock.fclk.display" option="board.clock.fclk.display.value"/>
     <node id="board.clock.uclk.display" option="board.clock.uclk.display.value"/>
-    <node id="board.clock.sdadcclk.source" option="board.clock.sdadcclk.source.disabled"/>
+    <node id="board.clock.sdadcclk.source" option="board.clock.sdadcclk.source.hoco"/>
     <node id="board.clock.sdadcclk.div" option="board.clock.sdadcclk.div.12"/>
     <node id="board.clock.sdadcclk.display" option="board.clock.sdadcclk.display.value"/>
     <node id="board.clock.clkout.source" option="board.clock.clkout.source.disabled"/>
@@ -40,7 +40,7 @@
   </raClockConfiguration>
   <raPinConfiguration>
     <pincfg active="true" name="" symbol="">
-      <configSetting altId="adc0.an06.p003" configurationId="adc0.an06" peripheral="ADC0"/>
+      <configSetting altId="adc0.an06.p003" configurationId="adc0.an06" isUsedByDriver="true" peripheral="ADC0"/>
       <configSetting altId="ctsu0.ts15.p001" configurationId="ctsu0.ts15" peripheral="CTSU0"/>
       <configSetting altId="ctsu0.tscap.p409" configurationId="ctsu0.tscap" peripheral="CTSU0"/>
       <configSetting altId="debug0.swclk.p300" configurationId="debug0.swclk" isUsedByDriver="true" peripheral="DEBUG0"/>
