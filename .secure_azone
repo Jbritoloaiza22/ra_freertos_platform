@@ -35,6 +35,7 @@
         <peripheral name="SPI0.CM23" group="SPI" security=""/>
         <peripheral name="RTC.CM23" security=""/>
         <peripheral name="ADC0.CM23" group="ADC" security=""/>
+        <peripheral name="SCI0.CM23" group="SCI" security=""/>
         <peripheral name="ICU.CM23">
             <slot name="IRQ0.CM23" secure="false"/>
             <slot name="IRQ1.CM23" secure="false"/>
@@ -42,6 +43,10 @@
             <slot name="IRQ3.CM23" secure="false"/>
             <slot name="IRQ4.CM23" secure="false"/>
             <slot name="IRQ5.CM23" secure="false"/>
+            <slot name="IRQ6.CM23" secure="false"/>
+            <slot name="IRQ7.CM23" secure="false"/>
+            <slot name="IRQ8.CM23" secure="false"/>
+            <slot name="IRQ9.CM23" secure="false"/>
         </peripheral>
     </partition>
 </azone>
