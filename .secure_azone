@@ -34,6 +34,7 @@
         </peripheral>
         <peripheral name="SPI0.CM23" group="SPI" security=""/>
         <peripheral name="RTC.CM23" security=""/>
+        <peripheral name="ADC0.CM23" group="ADC" security=""/>
         <peripheral name="ICU.CM23">
             <slot name="IRQ0.CM23" secure="false"/>
             <slot name="IRQ1.CM23" secure="false"/>

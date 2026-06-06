@@ -85,9 +85,9 @@ FSP Configuration
     Clock Src: HOCO
     ICLK Div /1
     PCLKB Div /2
-    PCLKD Div /1
+    PCLKD Div /2
     FCLK Div /2
-    SDADCCLK Disabled
+    SDADCCLK Src: HOCO
     SDADCCLK Div /12
     CLKOUT Disabled
     CLKOUT Div /1
@@ -255,6 +255,9 @@ FSP Configuration
     Parameter Checking: Default (BSP)
     Set Source Clock in Open: Enabled
     
+  Module "ADC (r_adc)"
+    Parameter Checking: Default (BSP)
+    
   FreeRTOS
     General: Custom FreeRTOSConfig.h: 
     General: Use Preemption: Enabled
@@ -275,7 +278,7 @@ FSP Configuration
     General: Idle Should Yield: Enabled
     General: Use Task Notifications: Enabled
     General: Task Notification Array Entries: 1
-    General: Use Mutexes: Disabled
+    General: Use Mutexes: Enabled
     General: Use Recursive Mutexes: Disabled
     General: Use Counting Semaphores: Enabled
     Hooks: Check For Stack Overflow: Disabled
@@ -424,4 +427,50 @@ FSP Configuration
       Alarm Interrupt Priority: Disabled
       Period Interrupt Priority: Disabled
       Carry Interrupt Priority: Priority 2
+      
+  Thread "TEMP_interface"
+    Symbol: TEMP
+    Name: TEMP_interface
+    Stack size (bytes): 1024
+    Priority: 1
+    Thread Context: NULL
+    Memory Allocation: Static
+    Allocate Secure Context: Enable
+    
+    Instance "g_adc0 ADC (r_adc)"
+      General: Name: g_adc0
+      General: Unit: 0
+      General: Resolution: 16-Bit
+      General: Alignment: Not supported
+      General: Clear after read: On
+      General: Mode: Single Scan
+      General: Double-trigger: Disabled
+      Input: Channel Scan Mask (channel availability varies by MCU): Temperature Sensor
+      Input: Group B Scan Mask (channel availability varies by MCU): 
+      Interrupts: Normal/Group A Trigger: Software
+      Interrupts: Group B Trigger: Disabled
+      Interrupts: Group Priority (Valid only in Group Scan Mode): Group A cannot interrupt Group B
+      Input: Add/Average Count: Disabled
+      Input: Reference Voltage control: VREFH0
+      Input: Addition/Averaging Mask (channel availability varies by MCU and unit): 
+      Input: Sample and Hold: Sample and Hold Channels (Available only on selected MCUs): 
+      Input: Sample and Hold: Sample Hold States (Applies only to channels 0, 1, 2): 24
+      Input: Window Compare: Window Mode: Disabled
+      Input: Window Compare: Event Output: OR
+      Input: Window Compare: Window A: Enable: Disabled
+      Input: Window Compare: Window A: Channels to compare (channel availability varies by MCU and unit): 
+      Input: Window Compare: Window A: Channel comparison mode (channel availability varies by MCU and unit): 
+      Input: Window Compare: Window A: Lower Reference: 0
+      Input: Window Compare: Window A: Upper Reference: 0
+      Input: Window Compare: Window B: Enable: Disabled
+      Input: Window Compare: Window B: Channel to compare (channel availability varies by MCU and unit): Channel 0
+      Input: Window Compare: Window B: Comparison mode: Less Than or Outside Window
+      Input: Window Compare: Window B: Lower Reference: 0
+      Input: Window Compare: Window B: Upper Reference: 0
+      Interrupts: Callback: NULL
+      Interrupts: Scan End Interrupt Priority: Disabled
+      Interrupts: Scan End Group B Interrupt Priority: Disabled
+      Interrupts: Window Compare A Interrupt Priority: Disabled
+      Interrupts: Window Compare B Interrupt Priority: Disabled
+      Extra: ADC Ring Buffer: Not Supported
       
