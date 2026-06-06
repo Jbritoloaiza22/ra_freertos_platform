@@ -3,7 +3,7 @@
 #include "task.h"
 #include "lvgl.h"
 #include "st7789.h"
-#include "RTC.c"
+#include "RTC.h"
 #include <stdio.h>
 
 #define GUI_TICK_MS (5U)
@@ -76,18 +76,13 @@ void GUI_entry(void *pvParameters)
         {
             time_acc_ms = 0;
 
-            if(time_acc_ms >= TIME_REFRESH_MS)
-            {
-                time_acc_ms = 0;
-
                 if (RTC_GetTime(&rtc_now))
                 {
                     snprintf(time_buf, sizeof(time_buf), "TIME: %02d:%02d:%02d",
                              rtc_now.tm_hour, rtc_now.tm_min, rtc_now.tm_sec);
                     lv_label_set_text(time_label, time_buf);
                 }
-            }
         }
-        vTaskDelay(pdMS_TO_TICKS(5));
+        vTaskDelay(pdMS_TO_TICKS(GUI_TICK_MS));
     }
 }
