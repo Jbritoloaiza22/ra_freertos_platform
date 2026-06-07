@@ -149,7 +149,7 @@ FSP Configuration
       P914 19 USB_FS0_DP - - - "Peripheral mode" - - "USB_FS0: DP" - IO - - 
       P915 18 USB_FS0_DM - - - "Peripheral mode" - - "USB_FS0: DM" - IO - - 
       RES# 25 SYSTEM0_RES - - - - - - - - IO "Read only" - 
-      SBIAS/VREFI 38 "SDADC0_VREFI / SDADC0_SBIAS" - - - - - - - - IO "Read only" - 
+      SBIAS/VREFI 38 "SDADC0_SBIAS / SDADC0_VREFI" - - - - - - - - IO "Read only" - 
       VCC 11 SYSTEM0_VCC - - - - - - - - IO "Read only" - 
       VCCUSB 20 USB_FS0_VCC - - - - - - - - IO "Read only" - 
       VCCUSBLDO 21 USB_FS0_VCCLDO - - - - - - - - IO "Read only" - 
@@ -215,7 +215,7 @@ FSP Configuration
       P914 19 - - - - Disabled - - "USB_FS0: DP" - IO - - 
       P915 18 - - - - Disabled - - "USB_FS0: DM" - IO - - 
       RES# 25 SYSTEM0_RES - - - - - - - - IO "Read only" - 
-      SBIAS/VREFI 38 "SDADC0_VREFI / SDADC0_SBIAS" - - - - - - - - IO "Read only" - 
+      SBIAS/VREFI 38 "SDADC0_SBIAS / SDADC0_VREFI" - - - - - - - - IO "Read only" - 
       VCC 11 SYSTEM0_VCC - - - - - - - - IO "Read only" - 
       VCCUSB 20 USB_FS0_VCC - - - - - - - - IO "Read only" - 
       VCCUSBLDO 21 USB_FS0_VCCLDO - - - - - - - - IO "Read only" - 
@@ -523,6 +523,15 @@ FSP Configuration
   Thread "RELAY_interface"
     Symbol: RELAY
     Name: RELAY_interface
+    Stack size (bytes): 1024
+    Priority: 1
+    Thread Context: NULL
+    Memory Allocation: Static
+    Allocate Secure Context: Enable
+    
+  Thread "ANOMALY_task"
+    Symbol: ANOMALY
+    Name: ANOMALY_task
     Stack size (bytes): 1024
     Priority: 1
     Thread Context: NULL

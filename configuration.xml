@@ -419,6 +419,15 @@
       <property id="rtos.awsfreertos.thread.allocation" value="rtos.awsfreertos.thread.allocation.static"/>
       <property id="rtos.awsfreertos.thread.secure_context" value="rtos.awsfreertos.thread.secure_context.enable"/>
     </context>
+    <context id="rtos.awsfreertos.thread.1378383729">
+      <property id="_symbol" value="ANOMALY"/>
+      <property id="rtos.awsfreertos.thread.name" value="ANOMALY_task"/>
+      <property id="rtos.awsfreertos.thread.stack" value="1024"/>
+      <property id="rtos.awsfreertos.thread.priority" value="1"/>
+      <property id="rtos.awsfreertos.thread.context" value="NULL"/>
+      <property id="rtos.awsfreertos.thread.allocation" value="rtos.awsfreertos.thread.allocation.static"/>
+      <property id="rtos.awsfreertos.thread.secure_context" value="rtos.awsfreertos.thread.secure_context.enable"/>
+    </context>
     <config id="config.driver.adc">
       <property id="config.driver.adc.param_checking_enable" value="config.driver.adc.param_checking_enable.bsp"/>
     </config>
