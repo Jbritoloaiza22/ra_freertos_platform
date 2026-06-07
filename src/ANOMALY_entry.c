@@ -216,7 +216,7 @@ void ANOMALY_entry(void *pvParameters)
         g_have_last_v = true;
         if (g_stuck_count >= STUCK_WINDOW)
         {
-            out.flags |= ANOMALY_STUCK;
+            //out.flags |= ANOMALY_STUCK;
         }
         /* 6) Final score (placeholder for TinyML). */
         out.score = anomaly_score(out.features);
