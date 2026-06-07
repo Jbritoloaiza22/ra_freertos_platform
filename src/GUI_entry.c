@@ -11,10 +11,10 @@
 #include "PZEM.h"
 #include "ANOMALY.h"
 #define GUI_TICK_MS (5U)
-#define TIME_REFRESH_MS (1000U)
-#define TEMP_REFRESH_MS (1000U)
-#define PZEM_REFRESH_MS (200U)
-#define RELAY_REFRESH_MS (200U)
+#define TIME_REFRESH_MS (250U)
+#define TEMP_REFRESH_MS (3000U)
+#define PZEM_REFRESH_MS (400U)
+#define RELAY_REFRESH_MS (1000U)
 #define ANOMALY_REFRESH_MS (500U)
  
 
@@ -182,7 +182,7 @@ void GUI_entry(void *pvParameters)
                     switch (anom.state)
                     {
                         case ANOMALY_STATE_FAULT:   color = 0xFF3030; break;
-                        case ANOMALY_STATE_WARNING: color = 0xFFD000; break;
+                        case ANOMALY_STATE_WARNING: color = 0xFF3030; break;
                         case ANOMALY_STATE_NORMAL:
                         default:                    color = 0x30FF30; break;
                     }
@@ -194,6 +194,7 @@ void GUI_entry(void *pvParameters)
                 lv_label_set_text(state_label, state_buf);
                 /* First flag tripped, on the next line. */
                 const char *reason = "";
+                if(ANOMALY_STATE_FAULT == anom.state){
                 if      (anom.flags & ANOMALY_SIGNAL_LOSS)   reason = "signal loss";
                 else if (anom.flags & ANOMALY_OVER_VOLTAGE)  reason = "over voltage";
                 else if (anom.flags & ANOMALY_UNDER_VOLTAGE) reason = "under voltage";
@@ -201,7 +202,9 @@ void GUI_entry(void *pvParameters)
                 else if (anom.flags & ANOMALY_STUCK)         reason = "sensor stuck";
                 else if (anom.flags & ANOMALY_SUDDEN_DELTA)  reason = "sudden delta";
                 else if (anom.flags & ANOMALY_PF_LOW)        reason = "low PF";
-
+                }
+                char reason_buf[16];
+                snprintf(reason,sizeof(reason_buf), "%-14s",reason);
                 lv_label_set_text(reason_label, reason);
             }
         }
