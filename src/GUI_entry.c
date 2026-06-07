@@ -14,6 +14,7 @@
 #define TIME_REFRESH_MS (1000U)
 #define TEMP_REFRESH_MS (1000U)
 #define PZEM_REFRESH_MS (200U)
+#define RELAY_REFRESH_MS (200U)
 #define ANOMALY_REFRESH_MS (500U)
  
 
@@ -70,15 +71,22 @@ void GUI_entry(void *pvParameters)
     lv_obj_set_style_text_color(time_label, lv_color_hex(0xffffff), LV_PART_MAIN);
     lv_obj_align(time_label, LV_ALIGN_TOP_LEFT, 0, 100);
 
+    lv_obj_t *relay_label = lv_label_create(scr);
+    lv_label_set_text(relay_label, "RELAY: OFF");
+    lv_obj_set_style_text_color(relay_label, lv_color_hex(0xffffff), LV_PART_MAIN);
+    lv_obj_align(relay_label, LV_ALIGN_TOP_LEFT, 0, 125);
+
     lv_obj_t *state_label = lv_label_create(scr);
     lv_label_set_text(state_label, "STATE: ------");
+    lv_obj_set_width(state_label,220);
     lv_obj_set_style_text_color(state_label, lv_color_hex(0xffffff), LV_PART_MAIN);
-    lv_obj_align(state_label, LV_ALIGN_TOP_LEFT, 0, 125);
+    lv_obj_align(state_label, LV_ALIGN_TOP_LEFT, 0, 150);
 
     lv_obj_t *reason_label = lv_label_create(scr);
-    lv_label_set_text(reason_label, "");
+    lv_label_set_text(reason_label, "            ");
+    lv_obj_set_width(reason_label,220);
     lv_obj_set_style_text_color(reason_label, lv_color_hex(0xffffff), LV_PART_MAIN);
-    lv_obj_align(reason_label, LV_ALIGN_TOP_LEFT, 0, 150);
+    lv_obj_align(reason_label, LV_ALIGN_TOP_LEFT, 0, 175);
     /* -------------------------
      * Main LVGL loop
      * ------------------------- */
@@ -86,6 +94,9 @@ void GUI_entry(void *pvParameters)
     uint32_t temp_acc_ms = 0;
     uint32_t pzem_acc_ms = 0;
     uint32_t anom_acc_ms = 0;
+    uint32_t relay_acc_ms = 0;
+    bool relay_on = false;
+    bool relay_shown = false;
     rtc_time_t rtc_now;
     float temp_c = 0.0f;
     pzem_data_t pzem;
@@ -141,6 +152,19 @@ void GUI_entry(void *pvParameters)
                 snprintf(pzem_buf, sizeof(pzem_buf), "CURRENT: %5.3f A",
                 (double) pzem.current_a);
                 lv_label_set_text(curr_label, pzem_buf);
+            }
+        }
+
+        relay_acc_ms += GUI_TICK_MS;
+        if (relay_acc_ms >= RELAY_REFRESH_MS)
+        {
+            relay_acc_ms = 0;
+
+            if(RELAY_GetState(&relay_on) && (relay_on != relay_shown))
+            {
+                relay_shown = relay_on;
+                lv_label_set_text(relay_label, relay_on ? "RELAY: ON" : "RELAY: OFF");
+                relay_shown = relay_on;
             }
         }
 
