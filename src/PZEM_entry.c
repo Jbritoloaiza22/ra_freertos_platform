@@ -3,7 +3,7 @@
 #include "task.h"
 #include "semphr.h"
 #include "queue.h"
-
+#include <stdint.h>
 #include <string.h>
 
  
@@ -76,6 +76,7 @@ static QueueHandle_t g_data_q;
 static StaticQueue_t g_data_q_buf;
 static uint8_t       g_data_q_storage[sizeof(pzem_data_t)];
 static volatile bool g_uart_open = false;
+static volatile uint32_t g_last_sample_ms = 0U;
 /* =========================================================================
  * CRC-16 (Modbus): init 0xFFFF, poly 0xA001 reflected.
  * ========================================================================= */
@@ -383,6 +384,10 @@ bool PZEM_GetData(pzem_data_t * out)
     }
     return pdTRUE == xQueuePeek(g_data_q, out, 0);
 }
+
+uint32_t PZEM_GetLastSampleMs(void){
+    return g_last_sample_ms;
+}
 /* =========================================================================
  * Task entry.
  * ========================================================================= */
@@ -425,6 +430,7 @@ void PZEM_entry(void * pvParameters)
         if (pzem_read_measurement(PZEM_ADDR_GENERAL, &sample))
         {
             (void) xQueueOverwrite(g_data_q, &sample);
+            g_last_sample_ms = (uint32_t)(xTaskGetTickCount() * portTICK_PERIOD_MS);
         }
         vTaskDelayUntil(&last_wake, pdMS_TO_TICKS(PZEM_POLL_PERIOD_MS));
     }

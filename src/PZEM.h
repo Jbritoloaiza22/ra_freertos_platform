@@ -37,3 +37,4 @@ bool PZEM_GetData(pzem_data_t * out);
 bool PZEM_ResetEnergy(uint8_t addr);
 bool PZEM_SetAlarmThreshold(uint8_t addr, uint16_t watts);
 bool PZEM_SetAddress(uint8_t current_addr, uint8_t new_addr);
+uint32_t PZEM_GetLastSampleMs(void);
