@@ -8,14 +8,15 @@
 #include "RELAY.h"
 #include <stdio.h>
 #include <stdbool.h>
+#include "PZEM.h"
 
 #define GUI_TICK_MS (5U)
 #define TIME_REFRESH_MS (1000U)
 #define TEMP_REFRESH_MS (1000U)
-#define RELAY_REFRESH_MS (200U)
+#define PZEM_REFRESH_MS (200U)
+ 
 
-void TEMP_QueueInit(void);
-bool TEMP_GetCelsius(float *out_c);
+ bool TEMP_GetCelsius(float *out_c);
 void TEMP_entry(void *pvParameters);
 static uint32_t lv_tick_get_ms(void)
 {
@@ -42,23 +43,24 @@ void GUI_entry(void *pvParameters)
 
     lv_obj_t *label;
 
-    label = lv_label_create(scr);
-    lv_label_set_text(label, "POWER:      0 W");
-    lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), LV_PART_MAIN);
-    lv_obj_align(label, LV_ALIGN_TOP_LEFT, 0, 0);
+    lv_obj_t *power_label = lv_label_create(scr);
+    lv_label_set_text(power_label, "POWER:      0 W");
+    lv_obj_set_style_text_color(power_label, lv_color_hex(0xffffff), LV_PART_MAIN);
+    lv_obj_align(power_label, LV_ALIGN_TOP_LEFT, 0, 0);
 
-    label = lv_label_create(scr);
-    lv_label_set_text(label, "VOLTAGE:  0.0 V");
-    lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), LV_PART_MAIN);
-    lv_obj_align(label, LV_ALIGN_TOP_LEFT, 0, 25);
+    lv_obj_t *volt_label = lv_label_create(scr);
+    lv_label_set_text(volt_label, "VOLTAGE:  0.0 V");
+    lv_obj_set_style_text_color(volt_label, lv_color_hex(0xffffff), LV_PART_MAIN);
+    lv_obj_align(volt_label, LV_ALIGN_TOP_LEFT, 0, 25);
 
-    label = lv_label_create(scr);
-    lv_label_set_text(label, "CURRENT:  0.0 A");
-    lv_obj_set_style_text_color(label, lv_color_hex(0xffffff), LV_PART_MAIN);
-    lv_obj_align(label, LV_ALIGN_TOP_LEFT, 0, 50);
+    lv_obj_t *curr_label = lv_label_create(scr);
+    lv_label_set_text(curr_label, "CURRENT:  0.0 A");
+    lv_obj_set_style_text_color(curr_label, lv_color_hex(0xffffff), LV_PART_MAIN);
+    lv_obj_align(curr_label, LV_ALIGN_TOP_LEFT, 0, 50);
+    (void) label;
 
     lv_obj_t *temp_label = lv_label_create(scr);
-    lv_label_set_text(temp_label, "TEMP:     --.- C");
+    lv_label_set_text(temp_label, "TEMP:   --.- C");
     lv_obj_set_style_text_color(temp_label, lv_color_hex(0xffffff), LV_PART_MAIN);
     lv_obj_align(temp_label, LV_ALIGN_TOP_LEFT, 0, 75);
 
@@ -67,23 +69,20 @@ void GUI_entry(void *pvParameters)
     lv_obj_set_style_text_color(time_label, lv_color_hex(0xffffff), LV_PART_MAIN);
     lv_obj_align(time_label, LV_ALIGN_TOP_LEFT, 0, 100);
 
-    lv_obj_t *relay_label = lv_label_create(scr);
-    lv_label_set_text(relay_label, "RELAY: OFF");
-    lv_obj_set_style_text_color(relay_label, lv_color_hex(0xffffff), LV_PART_MAIN);
-    lv_obj_align(relay_label, LV_ALIGN_TOP_LEFT, 0, 125);
 
     /* -------------------------
      * Main LVGL loop
      * ------------------------- */
     uint32_t time_acc_ms = 0;
     uint32_t temp_acc_ms = 0;
-    uint32_t relay_acc_ms = 0;
+    uint32_t pzem_acc_ms = 0;
     rtc_time_t rtc_now;
     float temp_c = 0.0f;
-    bool relay_on = false;
-    bool relay_shown = false;
+    pzem_data_t pzem;
+
     char time_buf[32];
     char temp_buf[32];
+    char pzem_buf[32];
 
     while (1)
     {
@@ -114,16 +113,22 @@ void GUI_entry(void *pvParameters)
             }
         }
 
-        relay_acc_ms += GUI_TICK_MS;
-        if (relay_acc_ms >= RELAY_REFRESH_MS)
+        pzem_acc_ms += GUI_TICK_MS;
+        if (pzem_acc_ms >= PZEM_REFRESH_MS)
         {
-            relay_acc_ms = 0;
+            pzem_acc_ms = 0;
 
-            if(RELAY_GetState(&relay_on) && (relay_on != relay_shown))
+            if (PZEM_GetData(&pzem))
             {
-                relay_shown = relay_on;
-                lv_label_set_text(relay_label, relay_on ? "RELAY: ON" : "RELAY: OFF");
-                relay_shown = relay_on;
+                snprintf(pzem_buf, sizeof(pzem_buf), "POWER: %6.1f W",
+                (double) pzem.power_w);
+                lv_label_set_text(power_label, pzem_buf);
+                snprintf(pzem_buf, sizeof(pzem_buf), "VOLTAGE: %5.1f V",
+                (double) pzem.voltage_v);
+                lv_label_set_text(volt_label, pzem_buf);
+                snprintf(pzem_buf, sizeof(pzem_buf), "CURRENT: %5.3f A",
+                (double) pzem.current_a);
+                lv_label_set_text(curr_label, pzem_buf);
             }
         }
         vTaskDelay(pdMS_TO_TICKS(GUI_TICK_MS));
