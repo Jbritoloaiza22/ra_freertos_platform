@@ -5,6 +5,7 @@
         <peripheral name="PORT0.CM23" group="PORT">
             <slot name="P001.CM23" secure="false"/>
             <slot name="P003.CM23" secure="false"/>
+            <slot name="P015.CM23" secure="false"/>
         </peripheral>
         <peripheral name="PORT1.CM23" group="PORT">
             <slot name="P108.CM23" secure="false"/>
@@ -25,11 +26,28 @@
         <peripheral name="PORT4.CM23" group="PORT">
             <slot name="P407.CM23" secure="false"/>
             <slot name="P409.CM23" secure="false"/>
+            <slot name="P410.CM23" secure="false"/>
             <slot name="P411.CM23" secure="false"/>
         </peripheral>
         <peripheral name="PORT9.CM23" group="PORT">
             <slot name="P914.CM23" secure="false"/>
             <slot name="P915.CM23" secure="false"/>
+        </peripheral>
+        <peripheral name="SPI0.CM23" group="SPI" security=""/>
+        <peripheral name="RTC.CM23" security=""/>
+        <peripheral name="ADC0.CM23" group="ADC" security=""/>
+        <peripheral name="SCI0.CM23" group="SCI" security=""/>
+        <peripheral name="ICU.CM23">
+            <slot name="IRQ0.CM23" secure="false"/>
+            <slot name="IRQ1.CM23" secure="false"/>
+            <slot name="IRQ2.CM23" secure="false"/>
+            <slot name="IRQ3.CM23" secure="false"/>
+            <slot name="IRQ4.CM23" secure="false"/>
+            <slot name="IRQ5.CM23" secure="false"/>
+            <slot name="IRQ6.CM23" secure="false"/>
+            <slot name="IRQ7.CM23" secure="false"/>
+            <slot name="IRQ8.CM23" secure="false"/>
+            <slot name="IRQ9.CM23" secure="false"/>
         </peripheral>
     </partition>
 </azone>
